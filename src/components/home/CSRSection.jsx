@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -18,18 +19,30 @@ export default function CSRSection() {
       </div>
 
       <div className="relative z-10 container-fluid text-center pt-16 md:pt-20">
-        <p
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-white/85 text-xs uppercase tracking-[3px] mb-3"
         >
           Our CSR
-        </p>
-        <h2
+        </motion.p>
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.1 }}
           className="font-heading text-white text-3xl md:text-5xl leading-tight"
         >
           Giving Back —<br className="hidden md:block" /> A Sense of Responsibility
-        </h2>
+        </motion.h2>
 
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.2 }}
           className="relative bg-white max-w-4xl mx-auto mt-8 sm:mt-10 md:mt-14 px-4 sm:px-10 md:px-14 pt-8 sm:pt-10 md:pt-14 pb-10 sm:pb-12 md:pb-16"
         >
           <Swiper
@@ -77,7 +90,7 @@ export default function CSRSection() {
           >
             <ChevronRight size={26} />
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

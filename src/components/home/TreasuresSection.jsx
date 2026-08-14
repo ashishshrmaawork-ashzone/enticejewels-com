@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -24,17 +25,26 @@ export default function TreasuresSection() {
     <section id="treasures" className="bg-white pt-16 pb-14 md:py-24 overflow-hidden">
       <div className="container-fluid">
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-start mb-8 md:mb-16">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+          >
             <p className="text-primary text-xs uppercase tracking-[3px] mb-3">Entice Brands</p>
             <h2 className="font-heading text-maroon text-3xl md:text-5xl">Treasures of Elegance</h2>
-          </div>
-          <p
+          </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.15 }}
             style={{ color: "#232020" }}
             className="w-full leading-relaxed md:text-left uppercase tracking-normal md:tracking-wide text-sm sm:text-base md:text-[20px]"
           >
             An ode to an exquisite and unparalleled luxury &lsquo;Entice Couture&rsquo; is a
             treasure to be inherited by generations.
-          </p>
+          </motion.p>
         </div>
 
         <div className="relative -mx-3 sm:mx-0">
@@ -60,7 +70,7 @@ export default function TreasuresSection() {
                   </div>
 
                   <div className="bg-white rounded-[18px] sm:rounded-3xl flex-1 p-5 sm:p-6 md:p-10 flex flex-col justify-center">
-                    <Image src={item.icon} alt="" width={44} height={34} unoptimized className="mb-3 h-8 w-auto object-contain" />
+                    <Image src={item.icon} alt="" width={44} height={34} unoptimized className="mb-3 h-8 object-contain" />
                     <h3 className="font-heading text-maroon text-2xl md:text-3xl mb-3">{item.title}</h3>
                     <p className="text-ink-soft text-sm leading-relaxed mb-5">{item.description}</p>
                     <Link
