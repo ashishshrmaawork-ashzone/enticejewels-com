@@ -52,7 +52,11 @@ export const metadata = {
       "An ode to an exquisite and unparalleled luxury — Entice Couture is a treasure to be inherited by generations.",
     images: ["/images/home-banner.jpg"],
   },
-  icons: { icon: "/images/entice-fashion-icon.png" },
+  icons: {
+    icon: [{ url: "/images/fevicon.png", type: "image/png" }],
+    shortcut: [{ url: "/images/fevicon.png", type: "image/png" }],
+    apple: [{ url: "/images/fevicon.png", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }) {
