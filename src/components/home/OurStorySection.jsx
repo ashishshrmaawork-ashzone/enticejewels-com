@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { ChevronsRight } from "lucide-react";
 
 export default function OurStorySection() {
@@ -10,11 +9,7 @@ export default function OurStorySection() {
     <section id="our-story" className="relative bg-white md:pt-24 overflow-hidden">
       <div className="relative">
         {/* Full-bleed dark background photo + #000000BF overlay */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
+        <div
           className="relative w-full min-h-[520px] md:min-h-[660px] flex items-center overflow-hidden"
         >
           <Image src="/images/our-story-bg.png" alt="" fill unoptimized className="object-cover" />
@@ -45,11 +40,7 @@ export default function OurStorySection() {
 
               {/* Mobile: image stacked below the text, still inside this same
                   background panel (so the bg photo + overlay shows behind it too) */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
+              <div
                 className="zoom-hover md:hidden relative h-[260px] rounded-2xl overflow-hidden shadow-xl mt-5"
               >
                 <Image
@@ -59,18 +50,14 @@ export default function OurStorySection() {
                   unoptimized
                   className="object-cover"
                 />
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Story image — overlaps the panel's top-right on desktop, aligned to the
             same right offset as container-fluid's own padding, with hover zoom */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+        <div
           className="zoom-hover hidden md:block absolute -top-40 right-5 md:right-12 xl:right-20 z-20 w-[55%] h-[100%] overflow-hidden shadow-2xl"
         >
           <Image
@@ -80,7 +67,7 @@ export default function OurStorySection() {
             unoptimized
             className="object-cover"
           />
-        </motion.div>
+        </div>
       </div>
     </section>
   );

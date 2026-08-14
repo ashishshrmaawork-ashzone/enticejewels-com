@@ -61,7 +61,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${gloock.variable} ${openSans.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${gloock.variable} ${openSans.variable}`}>
       <body className="antialiased font-body text-ink bg-white">
         <CartProvider>
           <Header />

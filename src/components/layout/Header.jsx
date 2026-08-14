@@ -389,7 +389,7 @@ export default function Header() {
             >
               Book an Appointment
             </span>
-            <Image src="/images/book-apoint-icon.png" alt="" width={20} height={20} unoptimized />
+            <Image src="/images/book-apoint-icon.png" alt="" width={20} height={20} unoptimized className="h-5 w-5" />
           </motion.button>
         )}
       </AnimatePresence>
