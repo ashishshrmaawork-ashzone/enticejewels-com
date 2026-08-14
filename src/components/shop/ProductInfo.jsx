@@ -24,7 +24,7 @@ export default function ProductInfo({ product, category, detailHref }) {
             {product.description}
           </p>
 
-          <div className="w-full max-w-xs mb-8">
+          <div className="w-full md:max-w-xs mb-8">
             <ProductActions product={product} categoryLabel={category.label} href={detailHref} />
           </div>
 
