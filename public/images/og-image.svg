@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#241009"/>
+      <stop offset="55%" stop-color="#4a2c1c"/>
+      <stop offset="100%" stop-color="#241009"/>
+    </linearGradient>
+    <radialGradient id="r" cx="50%" cy="35%" r="75%">
+      <stop offset="0%" stop-color="#8f6c3a" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#241009" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <rect width="1200" height="630" fill="url(#r)"/>
+  <circle cx="710.0" cy="416.9" r="113.5" fill="#8f6c3a" opacity="0.11" /><circle cx="318.8" cy="269.2" r="45.5" fill="#8f6c3a" opacity="0.07" /><circle cx="233.8" cy="181.2" r="129.6" fill="#8f6c3a" opacity="0.09" /><circle cx="484.6" cy="565.0" r="120.9" fill="#8f6c3a" opacity="0.13" /><circle cx="523.0" cy="409.5" r="72.5" fill="#8f6c3a" opacity="0.05" /><circle cx="289.8" cy="150.3" r="20.8" fill="#8f6c3a" opacity="0.06" /><circle cx="881.3" cy="549.6" r="86.3" fill="#8f6c3a" opacity="0.08" /><circle cx="16.0" cy="106.4" r="82.7" fill="#8f6c3a" opacity="0.12" />
+  <rect x="0" y="0" width="1200" height="630" fill="none" stroke="#d9b878" stroke-opacity="0.25" stroke-width="2"/>
+  <g font-family="Georgia, 'Times New Roman', serif" text-anchor="middle">
+    <text x="600" y="309" font-size="34.65" fill="#d9b878" letter-spacing="3" opacity="0.9">ENTICE JEWELS</text>
+    <text x="600" y="349.65" font-size="13.86" fill="#8f6c3a" letter-spacing="4" font-family="Arial, sans-serif">TREASURES OF ELEGANCE</text>
+  </g>
+</svg>

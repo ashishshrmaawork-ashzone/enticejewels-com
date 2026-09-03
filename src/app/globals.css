@@ -1,0 +1,157 @@
+@import "tailwindcss";
+
+@theme {
+  /* Palette lifted from the Entice design reference */
+  --color-primary: #b28952;       /* gold accent */
+  --color-primary-dark: #8f6c3a;
+  --color-maroon: #553632;        /* deep brown/maroon heading, footer, text */
+  --color-maroon-light: #6f4a44;
+  --color-cream: #faf6f0;         /* section backgrounds */
+  --color-ink: #2b2420;           /* body copy */
+  --color-ink-soft: #6b6058;
+
+  --font-heading: var(--font-gloock), Georgia, serif;
+  --font-body: var(--font-open-sans), sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overflow-x: hidden;
+    color: var(--color-ink);
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer utilities {
+  .container-fluid {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-fluid {
+      padding-inline: 3rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-fluid {
+      padding-inline: 5rem;
+    }
+  }
+
+  .gold-underline {
+    position: relative;
+  }
+  .gold-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 46px;
+    height: 2px;
+    background: var(--color-primary);
+  }
+
+  /* grayscale -> colour hover, used on the CSR slider */
+  .bw-hover img {
+    filter: grayscale(100%);
+    transition: filter 0.6s ease, transform 0.6s ease;
+  }
+  .bw-hover:hover img {
+    filter: grayscale(0%);
+  }
+
+  /* zoom-in on hover, used on the Our Story image */
+  .zoom-hover {
+    overflow: hidden;
+  }
+  .zoom-hover img,
+  .zoom-hover video {
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transform: scale(1);
+  }
+  .zoom-hover:hover img,
+  .zoom-hover:hover video {
+    transform: scale(1.08);
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marquee-track {
+    animation: marqueeY 18s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(32px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes marqueeY {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Swiper bullet styling shared across the site's sliders */
+.entice-swiper .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  background: var(--color-maroon);
+  opacity: 0.3;
+}
+.entice-swiper .swiper-pagination-bullet-active {
+  opacity: 1;
+  background: var(--color-primary);
+}
+
+/* Coverflow-style peek: side slides sit dimmed and slightly scaled down */
+.entice-coverflow .swiper-slide {
+  opacity: 0.4;
+  transform: scale(0.94);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.entice-coverflow .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

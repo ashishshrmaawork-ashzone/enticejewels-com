@@ -1,0 +1,1 @@
+"# enticejewels-in"  initgit add README.mdgit commit -m "first commit"git branch -M maingit remote add origin https://github.com/ashishshrmaawork-ashzone/enticejewels-in.gitgit push -u origin main

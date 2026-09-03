@@ -1,0 +1,6 @@
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
+import { getCurrentCustomer, loginCustomer, registerCustomer } from "@/lib/api";
+const AuthContext = createContext(null); const TOKEN_KEY = "entice-customer-token";
+export function AuthProvider({ children }) { const [user,setUser]=useState(null); const [ready,setReady]=useState(false); useEffect(()=>{if(!localStorage.getItem(TOKEN_KEY)){queueMicrotask(()=>setReady(true));return;} getCurrentCustomer().then(data=>setUser(data.user)).catch(()=>localStorage.removeItem(TOKEN_KEY)).finally(()=>setReady(true));},[]); const complete=(data)=>{localStorage.setItem(TOKEN_KEY,data.token);setUser(data.user);window.dispatchEvent(new Event("entice-auth-change"));return data.user;}; const login=async(form)=>complete(await loginCustomer(form)); const register=async(form)=>complete(await registerCustomer(form)); const logout=()=>{localStorage.removeItem(TOKEN_KEY);setUser(null);window.dispatchEvent(new Event("entice-auth-change"));}; return <AuthContext.Provider value={{user,ready,login,register,logout}}>{children}</AuthContext.Provider>; }
+export function useAuth(){const value=useContext(AuthContext);if(!value)throw new Error("useAuth must be used within AuthProvider");return value;}
