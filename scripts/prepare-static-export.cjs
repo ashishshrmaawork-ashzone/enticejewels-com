@@ -4,7 +4,8 @@ const { loadEnvConfig } = require("@next/env");
 
 const root = path.resolve(__dirname, "..");
 loadEnvConfig(root);
-const { basePath } = require("../next.config.js");
+const { env } = require("../next.config.js");
+const basePath = env.NEXT_PUBLIC_BASE_PATH;
 const output = path.join(root, "out");
 if (!fs.existsSync(path.join(output, "live", "index.html"))) {
   throw new Error("The live route shell is missing. Run a successful Next.js export first.");
