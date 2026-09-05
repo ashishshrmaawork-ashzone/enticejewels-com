@@ -1,4 +1,4 @@
-const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? (process.env.VERCEL ? '' : '/enticejewels.com')).replace(/\/$/, '');
+//const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? (process.env.VERCEL ? '' : '/enticejewels.com')).replace(/\/$/, '');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -11,11 +11,6 @@ const nextConfig = {
   // Keep the deployable static bundle for shared hosting.
   output: 'export',
   trailingSlash: true,
-
-
-
-  assetPrefix: basePath,
-  env: { NEXT_PUBLIC_BASE_PATH: basePath },
 
   images: {
     unoptimized: true,
