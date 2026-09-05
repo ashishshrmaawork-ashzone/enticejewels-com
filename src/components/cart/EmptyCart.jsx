@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { ShoppingBag } from "lucide-react";
 
 export default function EmptyCart() {

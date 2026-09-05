@@ -5,8 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/prepare-static-export.cjs",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:live": "node --test scripts/test-live-content.cjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

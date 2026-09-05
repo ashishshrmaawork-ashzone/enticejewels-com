@@ -1,8 +1,8 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 
-function formatPrice(value) {
+export function formatPrice(value) {
   return `₹${value.toLocaleString("en-IN")}.00`;
 }
 
@@ -19,7 +19,6 @@ export default function CartItemRow({ item, onUpdateQty, onRemove }) {
           <Link href={item.href} className="block font-heading text-maroon text-sm sm:text-base md:text-lg leading-snug break-words hover:text-primary transition-colors">
             {item.name}
           </Link>
-          <p className="text-ink-soft text-sm mt-1">{formatPrice(item.price)}</p>
         </div>
 
         <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">

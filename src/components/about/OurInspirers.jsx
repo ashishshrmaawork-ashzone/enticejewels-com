@@ -5,13 +5,20 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { inspirers } from "@/data/inspirers";
 
-export default function OurInspirers() {
+export default function OurInspirers({ title, items }) {
+  const slides = items?.length ? items.map((item, index) => ({
+    id: index,
+    name: item.our_inspirers_title,
+    title: item.our_inspirers_designation,
+    bio: item.our_inspirers_detail,
+    image: item.our_inspirers_image,
+  })) : [];
+  if (!slides.length) return null;
   return (
     <section id="our-inspirers" className="bg-white py-16 md:py-24">
       <h2 className="font-heading text-maroon text-3xl md:text-5xl text-center mb-10 md:mb-14">
-        Our Inspirers
+        {title || "Our Inspirers"}
       </h2>
 
       <div className="container mx-auto px-5 sm:px-6 md:px-8">
@@ -28,7 +35,7 @@ export default function OurInspirers() {
           speed={600}
           className="entice-swiper !pb-12"
         >
-          {inspirers.map((inspirer) => (
+          {slides.map((inspirer) => (
             <SwiperSlide key={inspirer.id}>
               {/* Fixed height (no autoHeight) — this is what caused the
                   earlier image/text mismatch with loop mode. */}

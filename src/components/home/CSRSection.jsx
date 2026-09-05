@@ -2,15 +2,22 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { csrItems } from "@/data/csr";
 
-export default function CSRSection() {
+export default function CSRSection({ eyebrow, title, subtitle, items }) {
   const swiperRef = useRef(null);
+  const slides = items?.length ? items.map((item) => ({
+    id: item.slug,
+    title: item.title,
+    image: item.image?.url || "/images/csr-1.png",
+    description: item.excerpt || item.content,
+  })) : [];
+
+  if (!slides.length) return null;
 
   return (
     <section id="csr" className="relative bg-white">
@@ -26,7 +33,7 @@ export default function CSRSection() {
           transition={{ duration: 0.6 }}
           className="text-white/85 text-xs uppercase tracking-[3px] mb-3"
         >
-          Our CSR
+          {eyebrow || "Our CSR"}
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 24 }}
@@ -35,7 +42,7 @@ export default function CSRSection() {
           transition={{ duration: 0.7, delay: 0.1 }}
           className="font-heading text-white text-3xl md:text-5xl leading-tight"
         >
-          Giving Back —<br className="hidden md:block" /> A Sense of Responsibility
+          {title || "Giving Back —"}<br className="hidden md:block" /> {subtitle || "A Sense of Responsibility"}
         </motion.h2>
 
         <motion.div
@@ -51,7 +58,7 @@ export default function CSRSection() {
             slidesPerView={1}
             breakpoints={{ 640: { slidesPerView: 2 } }}
           >
-            {csrItems.map((item) => (
+            {slides.map((item) => (
               <SwiperSlide key={item.id}>
                 <div className="bw-hover group cursor-pointer text-center">
                   <Link href={`/csr/${item.id}`} className="relative block aspect-[4/3] overflow-hidden">

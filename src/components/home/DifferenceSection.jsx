@@ -7,16 +7,24 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
-import { differences } from "@/data/differences";
 
-export default function DifferenceSection() {
+export default function DifferenceSection({ eyebrow, title, items }) {
   const swiperRef = useRef(null);
+  const slides = items?.length ? items.map((item, index) => ({
+    id: item.id || index,
+    title: `${item.title_first || ""}\n${item.title_second || ""}`.trim(),
+    description: item.content?.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim(),
+    image: item.image || item.background_image || "/images/makes-us-bg2.png",
+    buttonText: item.button?.label || item.button_text,
+  })) : [];
+
+  if (!slides.length) return null;
 
   return (
     <section id="difference" className="bg-white">
       <div className="text-center pt-16 md:pt-20 pb-8 md:pb-10">
-        <p className="text-primary text-xs uppercase tracking-[3px] mb-3">Entice Uniqueness</p>
-        <h2 className="font-heading text-maroon text-3xl md:text-5xl">What makes us different!</h2>
+        <p className="text-primary text-xs uppercase tracking-[3px] mb-3">{eyebrow || "Entice Uniqueness"}</p>
+        <h2 className="font-heading text-maroon text-3xl md:text-5xl">{title || "What makes us different!"}</h2>
       </div>
 
       <div className="relative">
@@ -30,7 +38,7 @@ export default function DifferenceSection() {
           speed={900}
           className="h-[560px] sm:h-[520px] md:h-[600px]"
         >
-          {differences.map((item) => (
+          {slides.map((item) => (
             <SwiperSlide key={item.id}>
               <div className="relative h-full w-full">
                 <Image src={item.image} alt={item.title} fill unoptimized className="object-cover" />
@@ -53,7 +61,7 @@ export default function DifferenceSection() {
                       style={{ backgroundColor: "#F3DF9E", color: "#232020", fontWeight: 600 }}
                       className="text-xs uppercase tracking-[2px] px-7 py-3 rounded hover:opacity-90 transition-opacity duration-300"
                     >
-                      View More
+                      {item.buttonText || "View More"}
                     </button>
                   </div>
                 </div>

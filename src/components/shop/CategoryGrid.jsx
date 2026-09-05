@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import Image from "next/image";
 
 export default function CategoryGrid({ collectionSlug, categories }) {

@@ -2,21 +2,27 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { boutiques } from "@/data/boutiques";
 
-export default function OurBoutiques() {
-  const [activeId, setActiveId] = useState(boutiques[0].id);
+export default function OurBoutiques({ title, items }) {
+  const [activeId, setActiveId] = useState(0);
+  const locations = items?.length ? items.map((item, index) => ({
+    id: index,
+    city: item.our_boutiques_title,
+    address: item.our_boutiques_location,
+    image: item.our_boutiques_image,
+  })) : [];
+  if (!locations.length) return null;
 
   return (
     <section className="bg-white py-16 md:py-24">
       <h2 className="font-heading text-maroon text-3xl md:text-5xl text-center mb-10 md:mb-14">
-        Our Boutiques
+        {title || "Our Boutiques"}
       </h2>
       <div
         className="container mx-auto px-4 sm:px-6 md:px-8 grid grid-cols-2 gap-2.5 sm:gap-3 md:flex md:h-[440px] lg:h-[500px] md:gap-4"
-        onMouseLeave={() => setActiveId(boutiques[0].id)}
+        onMouseLeave={() => setActiveId(locations[0].id)}
       >
-        {boutiques.map((b) => {
+        {locations.map((b) => {
           const active = activeId === b.id;
 
           return (

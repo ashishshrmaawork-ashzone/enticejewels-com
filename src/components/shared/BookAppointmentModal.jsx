@@ -2,11 +2,20 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, CheckCircle2 } from "lucide-react";
+import { X, CheckCircle2, RefreshCw } from "lucide-react";
+import { getContactCaptcha, submitAppointment } from "@/lib/api";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 export default function BookAppointmentModal({ open, onClose }) {
+  const settings = useSiteSettings();
+  const text = settings.appointment_form || {};
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({ name: "", phone: "", email: "", date: "", boutique: "" });
+  const [captcha, setCaptcha] = useState(null);
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const dialogRef = useRef(null);
   const titleId = useId();
 
@@ -15,8 +24,20 @@ export default function BookAppointmentModal({ open, onClose }) {
     setTimeout(() => {
       setSubmitted(false);
       setForm({ name: "", phone: "", email: "", date: "", boutique: "" });
+      setCaptchaAnswer("");
+      setError("");
     }, 300);
   }, [onClose]);
+
+  const refreshCaptcha = useCallback(async () => {
+    setCaptcha(null);
+    setCaptchaAnswer("");
+    try {
+      setCaptcha(await getContactCaptcha());
+    } catch (captchaError) {
+      setError(captchaError.message);
+    }
+  }, []);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -31,9 +52,30 @@ export default function BookAppointmentModal({ open, onClose }) {
     };
   }, [open, handleClose]);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (!open) return undefined;
+    let active = true;
+    getContactCaptcha()
+      .then((challenge) => { if (active) setCaptcha(challenge); })
+      .catch((captchaError) => { if (active) setError(captchaError.message); });
+    return () => { active = false; };
+  }, [open]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setError("");
+    try {
+      if (!captcha) throw new Error("Captcha is still loading. Please try again.");
+      const response = await submitAppointment({ ...form, captcha_token: captcha.token, captcha_answer: captchaAnswer });
+      setSuccessMessage(response.message || "Your appointment request has been received.");
+      setSubmitted(true);
+    } catch (requestError) {
+      setError(requestError.message);
+      await refreshCaptcha();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -71,13 +113,12 @@ export default function BookAppointmentModal({ open, onClose }) {
 
             {!submitted ? (
               <>
-                <p className="text-primary text-xs uppercase tracking-[3px] mb-2">Entice Jewels</p>
+                <p className="text-primary text-xs uppercase tracking-[3px] mb-2">{text.eyebrow || "Entice Jewels"}</p>
                 <h2 id={titleId} className="font-heading text-maroon text-2xl md:text-3xl mb-2">
-                  Book an Appointment
+                  {text.title || "Book an Appointment"}
                 </h2>
                 <p className="text-ink-soft text-sm leading-relaxed mb-6">
-                  Share your details and preferred date, and our team will schedule a
-                  personal appointment at your nearest boutique.
+                  {text.description || "Share your details and preferred date, and our team will schedule a personal appointment at your nearest boutique."}
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -86,7 +127,9 @@ export default function BookAppointmentModal({ open, onClose }) {
                     autoComplete="name"
                     type="text"
                     required
-                    placeholder="Your Name"
+                    minLength={2}
+                    maxLength={100}
+                    placeholder={text.name_placeholder || "Your Name"}
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     className="w-full border border-black/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-maroon transition-colors"
@@ -96,16 +139,23 @@ export default function BookAppointmentModal({ open, onClose }) {
                     autoComplete="tel"
                     type="tel"
                     required
-                    placeholder="Phone Number"
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    minLength={10}
+                    maxLength={10}
+                    title="Enter a valid 10-digit phone number"
+                    placeholder={text.phone_placeholder || "Phone Number"}
                     value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
                     className="w-full border border-black/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-maroon transition-colors"
                   />
                   <input
                     aria-label="Email address"
                     autoComplete="email"
                     type="email"
-                    placeholder="Email (optional)"
+                    required
+                    maxLength={191}
+                    placeholder={text.email_placeholder || "Email"}
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     className="w-full border border-black/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-maroon transition-colors"
@@ -113,27 +163,55 @@ export default function BookAppointmentModal({ open, onClose }) {
                   <input
                     aria-label="Preferred boutique"
                     type="text"
-                    placeholder="Preferred Boutique (optional)"
+                    maxLength={191}
+                    placeholder={text.boutique_placeholder || "Preferred Boutique (optional)"}
                     value={form.boutique}
                     onChange={(e) => setForm({ ...form, boutique: e.target.value })}
                     className="w-full border border-black/15 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-maroon transition-colors"
                   />
-                  <input
-                    aria-label="Preferred date"
-                    min={new Date().toISOString().split("T")[0]}
-                    type="date"
-                    placeholder="Preferred Date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    className="w-full border border-black/15 rounded-lg px-4 py-3 text-sm text-ink-soft focus:outline-none focus:border-maroon transition-colors"
-                  />
+                  <label className="block text-xs text-ink-soft">
+                    {text.date_label || "Preferred Date"}
+                    <input
+                      aria-label={text.date_label || "Preferred Date"}
+                      min={new Date().toISOString().split("T")[0]}
+                      type="date"
+                      required
+                      value={form.date}
+                      onChange={(e) => setForm({ ...form, date: e.target.value })}
+                      className="mt-2 w-full border border-black/15 rounded-lg px-4 py-3 text-sm text-ink-soft focus:outline-none focus:border-maroon transition-colors"
+                    />
+                  </label>
+
+                  <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
+                    <label className="text-xs uppercase tracking-wide text-ink-soft">
+                      {text.captcha_label || "CAPTCHA"}: <strong>{captcha?.question || "Loading…"}</strong>
+                      <input
+                        aria-label="Four digit captcha"
+                        required
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]{4}"
+                        maxLength={4}
+                        value={captchaAnswer}
+                        onChange={(e) => { setCaptchaAnswer(e.target.value.replace(/\D/g, "").slice(0, 4)); setError(""); }}
+                        disabled={!captcha || submitting}
+                        className="mt-2 w-full border border-black/15 rounded-lg px-4 py-3 text-sm normal-case tracking-normal focus:outline-none focus:border-maroon transition-colors disabled:opacity-60"
+                      />
+                    </label>
+                    <button type="button" onClick={refreshCaptcha} disabled={submitting} aria-label="Refresh captcha" className="border border-black/15 rounded-lg p-3 text-maroon disabled:opacity-60">
+                      <RefreshCw size={18} />
+                    </button>
+                  </div>
+
+                  {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
 
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-lg text-xs uppercase tracking-[2px] font-semibold transition-opacity hover:opacity-90"
+                    disabled={submitting || !captcha}
+                    className="w-full py-3 rounded-lg text-xs uppercase tracking-[2px] font-semibold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                     style={{ backgroundColor: "#553632", color: "#FFF1C1" }}
                   >
-                    Book Appointment
+                    {submitting ? (text.submitting_label || "Booking…") : (text.submit_label || "Book Appointment")}
                   </button>
                 </form>
               </>
@@ -141,18 +219,17 @@ export default function BookAppointmentModal({ open, onClose }) {
               <div className="text-center py-4">
                 <CheckCircle2 size={44} className="text-primary mx-auto mb-4" />
                 <h2 className="font-heading text-maroon text-2xl md:text-3xl mb-3">
-                  Thank You!
+                  {text.thank_you_title || "Thank You!"}
                 </h2>
                 <p className="text-ink-soft text-sm leading-relaxed mb-6">
-                  Your appointment request has been recorded. Our team will contact
-                  you to confirm the appointment.
+                  {successMessage}
                 </p>
                 <button
                   type="button"
                   onClick={handleClose}
                   className="inline-flex items-center gap-2 border border-maroon text-maroon text-xs uppercase tracking-[2px] px-7 py-3 rounded-full hover:bg-maroon hover:text-white transition-colors duration-300"
                 >
-                  Close
+                  {text.close_label || "Close"}
                 </button>
               </div>
             )}

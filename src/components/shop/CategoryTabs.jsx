@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import clsx from "clsx";
 
 export default function CategoryTabs({ collectionSlug, categories, activeSlug }) {

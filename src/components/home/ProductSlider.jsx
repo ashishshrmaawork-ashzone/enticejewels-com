@@ -2,16 +2,35 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import { products } from "@/data/products";
+
+const categorySlugAliases = {
+  bracelets: "bracelet",
+  earrings: "earring",
+  necklaces: "necklace",
+  pendants: "pendant",
+};
 
 export default function ProductSlider({
+  categories,
   sectionClassName = "pb-12 md:pt-10 md:pb-24",
 }) {
   const swiperRef = useRef(null);
+  const apiProducts = categories
+    ?.filter((category) => category.image)
+    .map((category) => ({
+      id: category.id,
+      label: category.title,
+      categorySlug: categorySlugAliases[category.slug] || category.slug,
+      image: category.image,
+      hoverImage: category.hover_image || category.image,
+    }));
+  const sliderProducts = apiProducts || [];
+
+  if (!sliderProducts.length) return null;
 
   return (
     <section className={`bg-white ${sectionClassName}`}>
@@ -27,7 +46,7 @@ export default function ProductSlider({
           }}
           className="entice-swiper"
         >
-          {products.map((product) => (
+          {sliderProducts.map((product) => (
             <SwiperSlide key={product.id}>
               <Link href={`/collections/entice-fashion/${product.categorySlug}`} className="group block cursor-pointer">
                 <div className="relative aspect-square rounded-lg border border-black/10 bg-[#f7f6f4] overflow-hidden">

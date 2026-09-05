@@ -1,7 +1,22 @@
 Options -MultiViews -Indexes
 
-# Static export: every route already has its own index.html folder,
-# so Apache's default directory index handles routing — no rewrite needed.
+# Existing files keep their normal static routing. New CMS detail URLs use
+# the live shell, which reads the URL and fetches the published item directly.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(?:blog|news|csr)/[^/]+/?$ live/index.html [END]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^collections/[^/]+(?:/[^/]+){0,2}/?$ live/index.html [END]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html|txt)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
 
 ErrorDocument 404 /404.html
 

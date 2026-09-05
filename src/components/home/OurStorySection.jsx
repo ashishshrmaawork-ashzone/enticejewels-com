@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { motion } from "framer-motion";
 import { ChevronsRight } from "lucide-react";
 
-export default function OurStorySection() {
+export default function OurStorySection({ eyebrow, title, content, image }) {
+  const paragraphs = content ? content.split(/\r?\n\r?\n/).filter(Boolean) : [];
+  const storyImage = image || "/images/our-story.png";
   return (
     <section id="our-story" className="relative bg-white md:pt-24 overflow-hidden">
       <div className="relative">
@@ -23,8 +25,13 @@ export default function OurStorySection() {
           {/* Text content stays aligned with the rest of the site's content width */}
           <div className="container-fluid relative z-10 py-12 md:py-0">
             <div className="max-w-md">
-              <p className="text-white/80 text-xs uppercase tracking-[3px] mb-3">About us</p>
-              <h2 className="font-heading text-white text-3xl md:text-5xl mb-6">Our Story</h2>
+              <p className="text-white/80 text-xs uppercase tracking-[3px] mb-3">{eyebrow || "About us"}</p>
+              <h2 className="font-heading text-white text-3xl md:text-5xl mb-6">{title || "Our Story"}</h2>
+              {paragraphs.length ? paragraphs.map((paragraph, index) => (
+                <p key={index} className={`text-white/70 text-sm md:text-base leading-relaxed ${index === paragraphs.length - 1 ? "mb-8" : "mb-4"}`}>
+                  {paragraph}
+                </p>
+              )) : <>
               <p className="text-white/70 text-sm md:text-base leading-relaxed mb-4">
                 Entice, KGK 1905&rsquo; is a captivating tale of exquisite designs, timeless
                 creations, divine luxury narrated by an unparalleled legacy. It blends
@@ -36,6 +43,7 @@ export default function OurStorySection() {
                 designers &amp; craftsmen with a promise of exclusivity that
                 complements the conviction of the wearer.
               </p>
+              </>}
               <Link
                 href="/about-us"
                 className="inline-flex items-center gap-1 text-primary text-xs uppercase tracking-[2px] hover:gap-2 transition-all"
@@ -53,7 +61,7 @@ export default function OurStorySection() {
                 className="zoom-hover md:hidden relative h-[260px] rounded-2xl overflow-hidden shadow-xl mt-5"
               >
                 <Image
-                  src="/images/our-story.png"
+                  src={storyImage}
                   alt="Entice Jewels boutique — Our Story"
                   fill
                   unoptimized
@@ -74,7 +82,7 @@ export default function OurStorySection() {
           className="zoom-hover hidden md:block absolute -top-40 right-5 md:right-12 xl:right-20 z-20 w-[55%] h-[100%] overflow-hidden shadow-2xl"
         >
           <Image
-            src="/images/our-story.png"
+            src={storyImage}
             alt="Entice Jewels boutique — Our Story"
             fill
             unoptimized

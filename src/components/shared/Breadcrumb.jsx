@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { ChevronRight } from "lucide-react";
 
 export default function Breadcrumb({ items = [] }) {

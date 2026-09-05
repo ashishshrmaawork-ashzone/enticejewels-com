@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "out",
+  "rewrites": [
+    { "source": "/blog/:slug", "destination": "/live/index.html" },
+    { "source": "/news/:slug", "destination": "/live/index.html" },
+    { "source": "/csr/:slug", "destination": "/live/index.html" },
+    { "source": "/collections/:collection", "destination": "/live/index.html" },
+    { "source": "/collections/:collection/:category", "destination": "/live/index.html" },
+    { "source": "/collections/:collection/:category/:product", "destination": "/live/index.html" }
+  ]
+}

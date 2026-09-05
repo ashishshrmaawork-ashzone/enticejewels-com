@@ -2,24 +2,34 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import { treasures } from "@/data/treasures";
 
 // Swiper's loop mode needs a generous clone buffer on both sides to loop
 // cleanly with centeredSlides — with only 2 real items we repeat the list so
 // there's always a slide to peek on the left AND right.
-const slides =
-  treasures.length < 6
-    ? Array.from({ length: 6 }, (_, i) => treasures[i % treasures.length])
-    : treasures;
-
-export default function TreasuresSection() {
+export default function TreasuresSection({ eyebrow, title, description, collections }) {
   const swiperRef = useRef(null);
+  const collectionItems = collections?.length
+    ? collections.map((collection) => {
+        return {
+          id: collection.slug,
+          title: collection.title,
+          image: collection.image,
+          icon: collection.icon,
+          description: collection.description || description,
+          href: `/collections/${collection.slug}`,
+        };
+      })
+    : [];
+  if (!collectionItems.length) return null;
+  const slides = collectionItems.length < 6
+    ? Array.from({ length: 6 }, (_, i) => collectionItems[i % collectionItems.length])
+    : collectionItems;
 
   return (
     <section id="treasures" className="bg-white pt-16 pb-14 md:py-24 overflow-hidden">
@@ -31,8 +41,8 @@ export default function TreasuresSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <p className="text-primary text-xs uppercase tracking-[3px] mb-3">Entice Brands</p>
-            <h2 className="font-heading text-maroon text-3xl md:text-5xl">Treasures of Elegance</h2>
+            <p className="text-primary text-xs uppercase tracking-[3px] mb-3">{eyebrow || "Entice Brands"}</p>
+            <h2 className="font-heading text-maroon text-3xl md:text-5xl">{title || "Treasures of Elegance"}</h2>
           </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
@@ -42,8 +52,7 @@ export default function TreasuresSection() {
             style={{ color: "#232020" }}
             className="w-full leading-relaxed md:text-left uppercase tracking-normal md:tracking-wide text-sm sm:text-base md:text-[20px]"
           >
-            An ode to an exquisite and unparalleled luxury &lsquo;Entice Couture&rsquo; is a
-            treasure to be inherited by generations.
+            {description || "An ode to an exquisite and unparalleled luxury ‘Entice Couture’ is a treasure to be inherited by generations."}
           </motion.p>
         </div>
 
@@ -70,7 +79,7 @@ export default function TreasuresSection() {
                   </div>
 
                   <div className="bg-white rounded-[18px] sm:rounded-3xl flex-1 p-5 sm:p-6 md:p-10 flex flex-col justify-center">
-                    <Image src={item.icon} alt="" width={44} height={34} unoptimized className="mb-3 h-8 object-contain" />
+                    {item.icon ? <Image src={item.icon} alt="" width={44} height={34} unoptimized className="mb-3 h-8 object-contain" /> : null}
                     <h3 className="font-heading text-maroon text-2xl md:text-3xl mb-3">{item.title}</h3>
                     <p className="text-ink-soft text-sm leading-relaxed mb-5">{item.description}</p>
                     <Link

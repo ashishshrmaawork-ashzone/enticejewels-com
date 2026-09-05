@@ -1,50 +1,36 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Menu, X, ChevronDown, ShoppingBag } from "lucide-react";
+import { Search, Menu, X, ChevronDown, ShoppingBag, Heart, UserRound } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import logoDark from "@/assets/images/logo-dark.png";
 import logoWhite from "@/assets/images/logo-white.png";
 import { useCart } from "@/context/CartContext";
 import BookAppointmentModal from "@/components/shared/BookAppointmentModal";
+import { resolveContentRoute, withBasePath } from "@/lib/contentRoutes";
+import { searchProducts } from "@/lib/api";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 
 // Every item goes to its own dedicated page — never to a mid-page section.
 // Items without a built page yet go to /coming-soon.
-const navItems = [
-  { label: "About us", href: "/about-us" },
-  { label: "Exceptional Legacy", href: "/about-us/#exceptional-legacy" },
-  { label: "Our Inspirer", href: "/about-us/#our-inspirers" },
-  { label: "Collections", href: "/collections/entice-fashion" },
-  { label: "CSR", href: "/#csr" },
-  { label: "Let's Connect", href: "/contact" },
-];
-
-const searchIndex = [
-  { label: "Treasures of Elegance", href: "/#treasures" },
-  { label: "Our Story", href: "/#our-story" },
-  { label: "About Us", href: "/about-us" },
-  { label: "Exceptional Legacy", href: "/about-us/#exceptional-legacy" },
-  { label: "What Makes Us Different", href: "/#difference" },
-  { label: "Giving Back — CSR", href: "/#csr" },
-  { label: "News & Events", href: "/#news" },
-  { label: "Entice Fashion Collection", href: "/collections/entice-fashion" },
-  { label: "Contact Us", href: "/contact" },
-];
-
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const isHome = pathname === "/";
-  const { totalCount } = useCart();
+  const { totalCount, wishlist } = useCart();
+  const settings = useSiteSettings();
+  const navItems = settings.header_menu || [];
   const [scrolled, setScrolled] = useState(false);
   const [pastHero, setPastHero] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [query, setQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchData, setSearchData] = useState({ items: [], total: 0 });
+  const [searchLoading, setSearchLoading] = useState(false);
   const [appointmentOpen, setAppointmentOpen] = useState(false);
   const navRef = useRef(null);
   const searchRef = useRef(null);
@@ -93,9 +79,24 @@ export default function Header() {
   // Same reveal behavior everywhere: only after scrolling past the banner.
   const showBookTab = pastHero;
 
-  const suggestions = query.trim()
-    ? searchIndex.filter((i) => i.label.toLowerCase().includes(query.trim().toLowerCase()))
-    : [];
+  useEffect(() => {
+    const term = query.trim();
+    if (term.length < 2) {
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        setSearchData(await searchProducts(term, { perPage: 5, signal: controller.signal }));
+      } catch (error) {
+        if (error.name !== "AbortError") setSearchData({ items: [], total: 0 });
+      } finally {
+        if (!controller.signal.aborted) setSearchLoading(false);
+      }
+    }, 300);
+    return () => { window.clearTimeout(timer); controller.abort(); };
+  }, [query]);
 
   const goTo = (href) => {
     setQuery("");
@@ -105,14 +106,18 @@ export default function Header() {
     if (targetPath === pathname && hash) {
       document.querySelector(`#${hash}`)?.scrollIntoView({ behavior: "smooth" });
     } else {
-      router.push(href);
+      if (resolveContentRoute(href)) window.location.assign(withBasePath(href));
+      else router.push(href);
     }
   };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const match = suggestions[0] || searchIndex.find((i) => i.label.toLowerCase().includes(query.trim().toLowerCase()));
-    if (match) goTo(match.href);
+    if (query.trim().length >= 2) goTo(`/search/?q=${encodeURIComponent(query.trim())}`);
+  };
+  const handleHeaderButton = () => {
+    if (settings.header_button?.url) window.location.assign(settings.header_button.url);
+    else setAppointmentOpen(true);
   };
 
   return (
@@ -126,8 +131,10 @@ export default function Header() {
         <div className="container-fluid relative flex items-center justify-between py-5 md:py-6">
           <Link href="/" className="flex-shrink-0">
             <Image
-              src={solid ? logoDark : logoWhite}
+              src={settings.header_logo || (solid ? logoDark : logoWhite)}
               alt="Entice Jewels"
+              width={350}
+              height={100}
               className="h-11 md:h-14 w-auto transition-all duration-500"
               priority
             />
@@ -147,6 +154,10 @@ export default function Header() {
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
+                if (e.target.value.trim().length < 2) {
+                  setSearchData({ items: [], total: 0 });
+                  setSearchLoading(false);
+                }
                 setShowSuggestions(true);
               }}
               onFocus={() => query.trim() && setShowSuggestions(true)}
@@ -161,24 +172,36 @@ export default function Header() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-64 bg-white rounded-md shadow-xl border border-black/5 py-2 text-left z-[100]"
+                  className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-96 bg-white rounded-md shadow-xl border border-black/5 py-2 text-left z-[100]"
                 >
-                  {suggestions.length ? (
-                    suggestions.map((item) => (
+                  {searchLoading ? (
+                    <p className="px-4 py-3 text-sm text-ink-soft">Searching...</p>
+                  ) : searchData.items.length ? (
+                    <>
+                    {searchData.items.map((item) => (
                       <Link
-                        key={item.href}
-                        href={item.href}
+                        key={item.id}
+                        href={item.path}
                         onClick={(e) => {
                           e.preventDefault();
-                          goTo(item.href);
+                          goTo(item.path);
                         }}
-                        className="block px-4 py-2 text-sm text-black hover:text-primary hover:bg-cream transition-colors"
+                        className="flex gap-3 px-4 py-2 text-sm text-black hover:text-primary hover:bg-cream transition-colors"
                       >
-                        {item.label}
+                        <span className="relative w-12 h-12 flex-shrink-0 overflow-hidden rounded bg-cream">
+                          {item.image?.url && <Image src={item.image.url} alt="" fill unoptimized className="object-cover" />}
+                        </span>
+                        <span className="min-w-0"><strong className="block truncate">{item.title}</strong><small className="block text-ink-soft truncate">{item.description}</small></span>
                       </Link>
-                    ))
+                    ))}
+                    {searchData.total > 5 && (
+                      <button type="button" onClick={() => goTo(`/search/?q=${encodeURIComponent(query.trim())}`)} className="w-full border-t border-black/10 mt-2 pt-3 pb-1 text-center text-xs uppercase tracking-[2px] text-maroon font-semibold">
+                        View All ({searchData.total})
+                      </button>
+                    )}
+                    </>
                   ) : (
-                    <p className="px-4 py-2 text-sm text-ink-soft">No results found</p>
+                    <p className="px-4 py-2 text-sm text-ink-soft">{query.trim().length < 2 ? "Type at least 2 characters" : "No products found"}</p>
                   )}
                 </motion.div>
               )}
@@ -186,6 +209,8 @@ export default function Header() {
           </form>
 
           <div className="flex items-center gap-4 md:gap-5 flex-shrink-0">
+            <Link href="/account" aria-label="Account" className={`flex-shrink-0 transition-colors duration-300 hover:text-primary ${tone}`}><UserRound size={20}/></Link>
+            <Link href="/wishlist" aria-label="Wishlist" className={`relative flex-shrink-0 transition-colors duration-300 hover:text-primary ${tone}`}><Heart size={20} />{wishlist.length > 0 && <span className="absolute -top-2 -right-2 bg-primary text-maroon text-[10px] font-bold leading-none w-4 h-4 rounded-full flex items-center justify-center">{wishlist.length}</span>}</Link>
             <Link
               href="/cart"
               aria-label="Cart"
@@ -299,7 +324,7 @@ export default function Header() {
             >
               <div className="flex items-center justify-between px-6 py-5 border-b border-black/10">
                 <Link href="/" onClick={() => setMenuOpen(false)}>
-                  <Image src={logoDark} alt="Entice Jewels" className="h-11 w-auto" priority />
+                  <Image src={settings.header_logo || logoDark} alt="Entice Jewels" width={350} height={100} className="h-11 w-auto" priority />
                 </Link>
                 <button type="button" onClick={() => setMenuOpen(false)} aria-label="Close menu" className="w-10 h-10 rounded-full bg-cream flex items-center justify-center text-maroon">
                   <X size={21} />
@@ -347,17 +372,17 @@ export default function Header() {
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
-                    setAppointmentOpen(true);
+                    handleHeaderButton();
                   }}
                   className="w-full mt-8 rounded-full bg-maroon px-6 py-3.5 text-[#fff1c1] text-xs font-semibold uppercase tracking-[2px]"
                 >
-                  Book an Appointment
+                  {settings.header_button?.label || "Book an Appointment"}
                 </button>
               </nav>
 
               <div className="px-6 py-6 bg-cream text-sm text-ink-soft">
-                <a href="mailto:info@enticemail.com" className="block hover:text-primary">info@enticemail.com</a>
-                <a href="tel:+919967341905" className="block mt-2 hover:text-primary">+91-9967341905</a>
+                <a href={`mailto:${settings.email || "info@enticemail.com"}`} className="block hover:text-primary">{settings.email || "info@enticemail.com"}</a>
+                <a href={`tel:${settings.phone || "+919967341905"}`} className="block mt-2 hover:text-primary">{settings.phone || "+91-9967341905"}</a>
               </div>
             </motion.aside>
           </>
@@ -369,7 +394,7 @@ export default function Header() {
         {showBookTab && (
           <motion.button
             type="button"
-            onClick={() => setAppointmentOpen(true)}
+            onClick={handleHeaderButton}
             initial={{ opacity: 0, x: 24 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 24 }}
@@ -387,7 +412,7 @@ export default function Header() {
                 letterSpacing: "-0.017em",
               }}
             >
-              Book an Appointment
+              {settings.header_button?.label || "Book an Appointment"}
             </span>
             <Image src="/images/book-apoint-icon.png" alt="" width={20} height={20} unoptimized />
           </motion.button>

@@ -3,6 +3,9 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/context/CartContext";
+import { SiteSettingsProvider } from "@/context/SiteSettingsContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { getGeneralSettings } from "@/lib/api";
 
 const gloock = Gloock({
   subsets: ["latin"],
@@ -18,14 +21,21 @@ const openSans = Open_Sans({
   display: "swap",
 });
 
-export const metadata = {
-  metadataBase: new URL("https://enticejewels.com"),
+export async function generateMetadata() {
+  const settings = await getGeneralSettings().catch(() => ({}));
+  const robots = settings.robots || { index: true, follow: true };
+  const seo = settings.seo || {};
+  const canonicalBase = seo.canonical_base || "https://enticejewels.com";
+  const defaultTitle = seo.default_title || "Entice Jewels | Treasures of Elegance";
+  const defaultDescription = seo.default_description || "Discover exceptional fine jewellery, timeless design and master craftsmanship from Entice Jewels.";
+  const defaultImage = seo.default_og_image || "/images/home-banner.jpg";
+  return {
+  metadataBase: new URL(canonicalBase),
   title: {
-    default: "Entice Jewels | Treasures of Elegance",
+    default: defaultTitle,
     template: "%s | Entice Jewels",
   },
-  description:
-    "Entice Jewels crafts exquisite, unparalleled luxury fine jewellery — an ode to timeless design, exceptional craftsmanship and generations of legacy.",
+  description: defaultDescription,
   keywords: [
     "Entice Jewels",
     "Entice Couture",
@@ -35,39 +45,44 @@ export const metadata = {
     "KGK Group",
   ],
   authors: [{ name: "Entice Jewels" }],
-  robots: { index: true, follow: true },
+  robots: {
+    index: robots.index !== false,
+    follow: robots.follow !== false,
+    googleBot: { index: robots.index !== false, follow: robots.follow !== false },
+  },
   openGraph: {
     type: "website",
-    siteName: "Entice Jewels",
-    title: "Entice Jewels | Treasures of Elegance",
-    description:
-      "An ode to an exquisite and unparalleled luxury — Entice Couture is a treasure to be inherited by generations.",
-    url: "https://enticejewels.com",
-    images: [{ url: "/images/home-banner.jpg", width: 1920, height: 1080 }],
+    siteName: seo.og_site_name || "Entice Jewels",
+    title: defaultTitle,
+    description: defaultDescription,
+    url: canonicalBase,
+    images: [{ url: defaultImage }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Entice Jewels | Treasures of Elegance",
-    description:
-      "An ode to an exquisite and unparalleled luxury — Entice Couture is a treasure to be inherited by generations.",
-    images: ["/images/home-banner.jpg"],
+    card: seo.twitter_card || "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+    images: [defaultImage],
   },
   icons: {
     icon: [{ url: "/images/fevicon.png", type: "image/png" }],
     shortcut: [{ url: "/images/fevicon.png", type: "image/png" }],
     apple: [{ url: "/images/fevicon.png", type: "image/png" }],
   },
-};
+  };
+}
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${gloock.variable} ${openSans.variable}`}>
       <body className="antialiased font-body text-ink bg-white">
-        <CartProvider>
+        <AuthProvider><CartProvider>
+          <SiteSettingsProvider>
           <Header />
           <main>{children}</main>
           <Footer />
-        </CartProvider>
+          </SiteSettingsProvider>
+        </CartProvider></AuthProvider>
       </body>
     </html>
   );

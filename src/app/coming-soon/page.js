@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/shared/ContentLink";
 
 export const metadata = {
   title: "Coming Soon",

@@ -1,3 +1,5 @@
+const basePath = (process.env.NEXT_PUBLIC_BASE_PATH ?? (process.env.VERCEL ? '' : '/enticejewels.com')).replace(/\/$/, '');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   agentRules: false,
@@ -6,10 +8,14 @@ const nextConfig = {
   // double-mount state. kgk-group-final disables it for the same reason.
   reactStrictMode: false,
 
-  // Static export -> just upload the generated "out" folder to the server.
-  // No Node/terminal needed on the server at all.
+  // Keep the deployable static bundle for shared hosting.
   output: 'export',
   trailingSlash: true,
+
+
+
+  assetPrefix: basePath,
+  env: { NEXT_PUBLIC_BASE_PATH: basePath },
 
   images: {
     unoptimized: true,
@@ -17,3 +23,4 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+

@@ -116,6 +116,12 @@
   100% { transform: translateY(-50%); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
 /* Swiper bullet styling shared across the site's sliders */
 .entice-swiper .swiper-pagination-bullet {
   width: 8px;
