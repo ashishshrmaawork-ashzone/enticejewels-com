@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 import LivePage from "@/components/live/LivePage";
+import PageHero from "@/components/shared/PageHero";
 import Link from "@/components/shared/ContentLink";
 import { ChevronRight } from "lucide-react";
 import { getPrivacyPolicyPage } from "@/lib/api";
@@ -15,9 +16,9 @@ function ContentView({
   page
 }) {
   return <>
-      <div className="pt-[84px] md:pt-[104px]">
-        <div className="h-5 bg-maroon bg-[url('/images/about-banner-bg.png')] bg-cover bg-center" aria-hidden="true" />
-      </div>
+      <PageHero image={page.featured_image?.url || "/images/about-banner-bg.png"} alt={page.featured_image?.alt || page.title}>
+        <h1 className="font-heading text-white text-3xl sm:text-4xl md:text-6xl">{page.title}</h1>
+      </PageHero>
       <nav aria-label="Breadcrumb" className="mx-auto w-full px-5 py-7 sm:px-6 md:w-[87%] md:px-0 md:py-9">
         <ol className="flex items-center gap-2.5 text-sm uppercase tracking-wide">
           <li><Link href="/" className="text-ink-soft transition-colors hover:text-primary">Home</Link></li>
