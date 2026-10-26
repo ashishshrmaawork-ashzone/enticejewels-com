@@ -21,7 +21,7 @@ export default function TreasuresSection({ eyebrow, title, description, collecti
           title: collection.title,
           image: collection.image,
           icon: collection.icon,
-          description: collection.description || description,
+          description: collection.description,
           href: `/collections/${collection.slug}`,
         };
       })
